@@ -1,5 +1,5 @@
 import {observable} from 'mobx'
 
-export default class Edit{
+export default class Crawl{
     @observable editorState={}
 }
