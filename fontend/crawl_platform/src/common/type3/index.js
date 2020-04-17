@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 
-export default class CreateTabs extends Component {
+export default class Type3 extends Component {
     render() {
         return (
             <div>
-                CreateTabs
+                type3
             </div>
         )
     }

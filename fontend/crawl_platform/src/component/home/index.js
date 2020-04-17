@@ -6,7 +6,7 @@ import Show from '../show';
 import Data from '../data';
 import './index.less'
 
-const { Content, Footer, Header,Sider } = Layout;
+const { Content, Footer, Header } = Layout;
 
 export default class Home extends Component {
   state = {
@@ -39,18 +39,19 @@ export default class Home extends Component {
 
   render() {
     return (
-      <Layout theme="light">
-    <Header style={{ position: 'fixed', zIndex: 1, width: '100%',backgroundColor:"white" }} >
-      <div className="logo" />
+      <Layout theme="light" className="layout">
+    <Header style={{backgroundColor:"White"}}>
       <Menu
               defaultSelectedKeys={[this.state.activeIndex]}
               mode="horizontal"
-              theme="light"
+              theme="light" style={{height:"50px"}}
           >
             <Menu.Item
                 key="1"
+                style={{height:"50px"}}
                 onClick={() => {
                 this.handleClick(1);
+                
               }}
             >
               <HomeOutlined />
@@ -58,6 +59,7 @@ export default class Home extends Component {
             </Menu.Item>
             <Menu.Item
                 key="2"
+                style={{height:"50px"}}
                 onClick={() => {
                 this.handleClick(2);
               }}
@@ -67,6 +69,7 @@ export default class Home extends Component {
             </Menu.Item>
             <Menu.Item
                 key="3"
+                style={{height:"50px"}}
                 onClick={() => {
                 this.handleClick(3);
               }}
@@ -76,7 +79,7 @@ export default class Home extends Component {
             </Menu.Item>
           </Menu>
           </Header>
-    <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64 }} theme="light">
+    <Content className="site-layout" theme="light">
     {
               this.renderMenu()
             }
