@@ -1,13 +1,17 @@
-import React, { Component } from 'react'
-import {BrowserRouter,Route} from 'react-router-dom'
-import Home from '../component/home'
+import React, { Component } from 'react';
+import {BrowserRouter,Route,Switch} from 'react-router-dom';
+import Admin from '../component/admin'
 
 
 export default class AppRouter extends Component {
     render() {
         return (
             <BrowserRouter>
-            <Route path="/" component={Home}></Route>
+            <Switch>
+            <Route component={Admin}
+                path="/"
+            />
+            </Switch>
             </BrowserRouter>
         )
     }

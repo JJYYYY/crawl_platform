@@ -1,7 +1,6 @@
 .crawl-first-request-post-item{
     margin-top:10px;
     padding: 10px;
-    border:1px solid black;
     .crawl-first-request-post-url{
         margin-top:10px;
         display: flex;
@@ -59,15 +58,14 @@
             border-radius: 5px;
         }
     }
-    .crawl-first-request-post-button{
+    .crawl-first-request-button{
         margin-top:10px;
-        border-radius: 5px;
-    }
-    .crawl-first-request-post-debug-button{
-        margin-left: 10px;
-        background-Color:rgb(149,236,105);
-        border:none;
-        color:black;
-        border-radius: 5px;
+        display: flex;
+        justify-content: flex-end;
+        .ant-btn{
+          &:nth-child(2){
+              margin-left:10px;
+          }
+        }
     }
 }

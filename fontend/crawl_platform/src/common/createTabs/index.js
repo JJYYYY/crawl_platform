@@ -1,83 +1,89 @@
-import React, { Component } from "react";
-import { Input, Button, Radio } from "antd";
-import { BugTwoTone } from "@ant-design/icons";
-import GetRequest from "../getRequest";
-import PostRequest from "../postRequest";
-import FirsetRequestParse from "../firstRequestParse";
-import "./index.less";
+import React, { Component } from 'react';
+import { Input } from 'antd';
+import WrapperRadio from '../wrapperRadio'
+import { BugTwoTone } from '@ant-design/icons';
+import GetRequest from '../getRequest';
+import PostRequest from '../postRequest';
+import FirsetRequestParse from '../firstRequestParse';
+import DetailRequestParse from '../detailRequestParse'
+import DetermineButton from '../determineButton'
+import './index.less';
 
 export default class CreateTabs extends Component {
   state = {
     crawlNameState: true,
-    crawlFirstRequestValue: "请求方式",
-    requestType: "GET",
+    crawlFirstRequestValue: '请求方式',
+    requestType: 'GET'
   };
   handleCrawlNameClick = () => {
     let state = !this.state.crawlNameState;
     this.setState({
-      crawlNameState: state,
+      crawlNameState: state
     });
   };
   handleMenuClick = (e) => {
     let value = e.target.value;
     this.setState({
-      crawlFirstRequestValue: value,
+      crawlFirstRequestValue: value
     });
   };
 
   handleRadioChange = (e) => {
     this.setState({
-      requestType: e.target.value,
+      requestType: e.target.value
     });
   };
 
   render() {
+    const data=[{value:'GET',text:'GET'},{value:'POST',text:'POST'}]
     return (
       <div className="crawl-content">
         <div className="crawl-name">
           <Input
-            className="crawl-name-input"
-            placeholder="爬虫名字"
-            prefix={<BugTwoTone />}
-            disabled={!this.state.crawlNameState}
+              className="crawl-name-input"
+              disabled={!this.state.crawlNameState}
+              placeholder="爬虫名字"
+              prefix={<BugTwoTone />}
           />
-          <Button
-            className="crawl-name-button"
-            type="primary"
-            onClick={this.handleCrawlNameClick}
-          >
-            {this.state.crawlNameState ? "确定" : "编辑"}
-          </Button>
+
+
+            {this.state.crawlNameState ? <DetermineButton onClick={this.handleCrawlNameClick}
+                text="确定"
+                                         /> : <DetermineButton
+                                             onClick={this.handleCrawlNameClick}
+                                             text="编辑"
+                                              />}
         </div>
-        <div className="crawl-first-request">
-          <Radio.Group
-            className="crawl-first-request-group"
-            buttonStyle="solid"
-            defaultValue={this.state.requestType}
-            onChange={this.handleRadioChange}
-          >
-            <Radio.Button value="GET" className="crawl-first-request-group-get">
-              GET
-            </Radio.Button>
-            <Radio.Button
-              value="POST"
-              className="crawl-first-request-group-post"
-            >
-              POST
-            </Radio.Button>
-          </Radio.Group>
-          <div className="crawl-first-request-item">
-            {this.state.requestType === "GET" ? (
+        <div className="crawl-first-step">
+          <div className="crawl-first-step-name">第一步</div>
+          <div className="crawl-first-step-content">
+          <WrapperRadio buttonStyle="solid"
+              data={data}
+              defaultValue={this.state.requestType}
+              onChange={this.handleRadioChange}
+          />
+            {this.state.requestType === 'GET' ? (
               <GetRequest />
             ) : (
               <PostRequest />
             )}
           </div>
-          <div className="crawl-first-request-parse">
+          </div>
+
+
+          <div className="crawl-second-step">
+          <div className="crawl-second-step-name">第二步</div>
+          <div className="crawl-second-step-content">
             <FirsetRequestParse />
           </div>
+          </div>
+          <div className="crawl-third-step">
+          <div className="crawl-third-step-name">第三步</div>
+          <div className="crawl-third-step-content">
+            <DetailRequestParse />
+          </div>
+          </div>
         </div>
-      </div>
     );
   }
 }

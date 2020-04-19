@@ -1,24 +1,39 @@
-import React, { Component } from "react";
-import Create from '../../common/create'
-import CreateTabs from "../../common/createTabs";
-import "./index.less";
+import React, { Component } from 'react';
+import { Layout } from 'antd'
+import {Redirect, Route, Switch} from 'react-router-dom'
+import CrawlCreate from '../crawlCreate'
+import CrawlTable from '../crawlTable'
+import LeftNav from '../leftNav'
+import NotFound from  '../notfound'
+import './index.less';
 
 
+const { Sider, Content } = Layout
 export default class Crawl extends Component {
-  state = {
-    active: false
-  };
-  changeState=()=>{
-    let active=!this.state.active
-    this.setState(
-      {active}
-    )
-  }
+
   render() {
-    return <div className="crawl">
-      <div className="crawl-wrapper">
-      {this.state.active ? <CreateTabs changeState={this.changeState}/> : <Create changeState={this.changeState}/>}
-      </div>
-    </div>;
+    return (
+      <Layout style={{height:'100%'}}>
+        <Sider>
+          <LeftNav/>
+        </Sider>
+        <Content>
+        <Switch>
+        <Redirect exact
+            from="/crawl"
+            to="/crawl/create"
+        />
+              <Route component={CrawlCreate}
+                  path="/crawl/create"
+              />
+               <Route component={CrawlTable}
+                   path="/crawl/table"
+               />
+              <Route component={NotFound}/>
+            </Switch>
+        </Content>
+        </Layout>
+    )
+
   }
 }

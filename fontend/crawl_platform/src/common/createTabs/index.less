@@ -1,31 +1,100 @@
 .crawl-content{
     .crawl-name{
         width: 60%;
-        margin-left: 50px;
         margin-top: 30px;
-        border: 1px solid black;
         display: flex;
-        padding: 20px;
     .crawl-name-input{
         width: 400px;
         margin-right: 20px;
         border-radius: 5px;
     }
     }
-    .crawl-first-request{
-        width: 60%;
-        margin-left: 50px;
-        margin-top: 30px;
-        border: 1px solid black;
+
+    .crawl-first-step{
+        border:1px dashed black;
+        display: flex;
+        width:90%;
+        margin-top: 20px;
         padding: 20px;
-     .crawl-first-request-group{
-        .crawl-first-request-group-get{
-        border-radius: 5px;
-        }
-        .crawl-first-request-group-post{
-            margin-left: 20px;
-        border-radius: 5px;
+    .crawl-first-step-name{
+        -webkit-text-stroke: 1.0px #000;
+        color:white;
+        font-size:60px;
+        font-weight:bold;
+        display: flex;
+        align-items: center;
+        padding-right: 20px;
+    }  
+    .crawl-first-step-content{
+        border-left: 1px dashed black;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        .ant-radio-group{
+            display: flex;
+            justify-content: flex-start;
+        .ant-radio-button-wrapper{
+            position: static;
+            width: 60px;
+            display: flex;
+            justify-content: center;
+            border-radius: 5px;
+            border-left: 1px solid #d9d9d9;
+            &:nth-child(2){
+                margin-left:20px
+            }
         }
     }
+}
     }
+
+        .crawl-second-step{
+            border:1px dashed black;
+            display: flex;
+            width: 90%;
+            margin-top: 20px;
+            padding: 20px;
+        .crawl-second-step-name{
+            -webkit-text-stroke: 1.0px #000;
+            color:white;
+            font-size:60px;
+            font-weight:bold;
+            display: flex;
+            align-items: center;
+            padding-right: 20px;
+        }  
+        .crawl-second-step-content{
+            border-left: 1px dashed black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            
+        }
+    }
+
+    .crawl-third-step{
+        border:1px dashed black;
+        display: flex;
+        width: 90%;
+        margin-top: 20px;
+        padding: 20px;
+    .crawl-third-step-name{
+        -webkit-text-stroke: 1.0px #000;
+        color:white;
+        font-size:60px;
+        font-weight:bold;
+        display: flex;
+        align-items: center;
+        padding-right: 20px;
+    }  
+    .crawl-third-step-content{
+        border-left: 1px dashed black;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        
+    }
+}
+
+
 }
