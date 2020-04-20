@@ -31,7 +31,7 @@ export default class DetailRequestParse extends Component {
                     ]}
                 defaultValue="css"
                 onChange={(value)=>this.handleChange(value)}
-                width="100"
+                width="0.7rem"
             />
     <Input/><DebugButton text="调试"/></span>
         </div>

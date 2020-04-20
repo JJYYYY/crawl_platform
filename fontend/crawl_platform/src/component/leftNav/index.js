@@ -9,7 +9,7 @@ class LeftNav extends Component {
             <div className="left-nav">
  <Menu
      defaultSelectedKeys={[1]}
-     style={{width:'200px'}}
+     style={{width:'1rem'}}
      theme="light"
  >
             <Menu.Item

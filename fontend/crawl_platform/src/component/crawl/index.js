@@ -14,7 +14,7 @@ export default class Crawl extends Component {
   render() {
     return (
       <Layout style={{height:'100%'}}>
-        <Sider>
+        <Sider width='1rem'>
           <LeftNav/>
         </Sider>
         <Content>

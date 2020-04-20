@@ -69,8 +69,6 @@ export default class CreateTabs extends Component {
             )}
           </div>
           </div>
-
-
           <div className="crawl-second-step">
           <div className="crawl-second-step-name">第二步</div>
           <div className="crawl-second-step-content">

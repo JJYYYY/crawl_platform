@@ -9,9 +9,18 @@
       name="description"
       content="Web site created using create-react-app"
     />
+    <script>
+      var width = document.documentElement.clientWidth
+      var css = `
+          html{
+          font-size: ${width/10}px;
+          }
+          `
+      document.write(`<style>${css}</style>`)
+  </script>
     <style>
       
-html, body {
+body {
   font-family: "Microsoft YaHei", "Heiti SC", tahoma, arial, "Hiragino Sans GB", 宋体, sans-serif;
     height: 100%;
     margin: 0px;
