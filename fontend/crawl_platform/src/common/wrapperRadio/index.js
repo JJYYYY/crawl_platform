@@ -14,6 +14,7 @@ export default class WrapperRadio extends Component {
         return (
 
             <Radio.Group
+                disabled={this.props.disabled ? this.props.disabled : false}
                 buttonStyle={this.props.buttonStyle}
                 defaultValue={this.props.defaultValue}
                 onChange={this.props.onChange}

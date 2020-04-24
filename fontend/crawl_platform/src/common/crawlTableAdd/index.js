@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Input } from 'antd';
+// import cookie from 'react-cookies'
 import EditableTable from '../editableTable'
 import DetermineButton from '../determineButton'
 import './index.less'
@@ -7,7 +8,8 @@ import './index.less'
 
 export default class CrawlTableAdd extends Component {
     state={
-        tableNameState:true
+        tableNameState:true,
+        val:''
     }
 
     handleClick = () => {
@@ -17,11 +19,19 @@ export default class CrawlTableAdd extends Component {
         });
       };
 
+    handleChange = (e)=>{
+        let val=e.target.value
+        this.setState({
+            val
+        })
+      }
+
     render() {
         return (
             <div className="crawl-table-add">
-<div className="crawl-table-name">
+        <div className="crawl-table-name">
           <Input
+            onChange={this.handleChange}
               className="crawl-name-input"
               disabled={!this.state.tableNameState}
               placeholder="表名"
