@@ -9,7 +9,8 @@ import './index.less'
 export default class CrawlTableAdd extends Component {
     state={
         tableNameState:true,
-        val:''
+        tableData:[],
+        val:'' //表名
     }
 
     handleClick = () => {
@@ -25,6 +26,14 @@ export default class CrawlTableAdd extends Component {
             val
         })
       }
+
+    changeState=()=>{
+      this.setState({
+        tableNameState:true
+      })
+    }
+
+
 
     render() {
         return (
@@ -43,7 +52,9 @@ export default class CrawlTableAdd extends Component {
                                             text="编辑"
                                              />}
         </div>
-              {this.state.tableNameState ? '' : <EditableTable />}
+              {this.state.tableNameState ? '' : 
+              <EditableTable name={this.state.val} 
+              dataSource={this.state.tableData} type='new'/>}
             </div>
         )
     }

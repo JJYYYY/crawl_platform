@@ -2,36 +2,71 @@ import React, { Component } from 'react'
 import { Descriptions } from 'antd';
 import WrapperSelect from '../wrapperSelect'
 import EditableTable from '../editableTable'
+import {getTable} from '../../api'
 import './index.less'
 
 export default class CrawlTableShow extends Component {
     state={
-        selectVal:'abc'
+        selectVal:'',
+        data:[],
+        tableData:[]
     }
     handleChange=(val)=>{
         this.setState({
             selectVal:val
+        },()=>{
+            getTable(this.state.selectVal).then(
+                res=>{
+                    this.setState({
+                        tableData:JSON.parse(res.data),
+                        selectVal:this.state.data[0].value
+                    })
+                }
+            )
         })
     }
 
+componentDidMount(){
+    console.log('香蕉再次进来时不会请求接口')
+    getTable().then(
+        res=>{
+            this.setState({
+                data:res.data
+            },()=>{
+                if (this.state.data.length>0){
+                getTable(this.state.data[0].value).then(
+                    res=>{
+                        // let result=[]
+                        // result.push(res.data)
+                        
+                        this.setState({
+                            tableData:JSON.parse(res.data),
+                            selectVal:this.state.data[0].value
+                        })
+                    }
+                )}
+            })
+        }
+    )
+}
+
+
+
+
+
+
     render() {
-        const data=[{
-            value:'abc',
-            text:'abc'
-        },
-        {
-            value:'abcd',
-            text:'abcd'
-        }]
         return (
             <div className="crawl-table-show">
-                <div className="crawl-table-name">
-                    <WrapperSelect
-                        data={data}
-                        defaultValue={data[0].value}
-                        onChange={this.handleChange}
-                        width="80"
-                    /></div>
+                {this.state.data.length>0 ? 
+                <div>
+                 <div className="crawl-table-name">
+                 <WrapperSelect
+                     data={this.state.data}
+                     defaultValue={this.state.data[0].value}
+                     onChange={this.handleChange}
+                     width="80"
+                 /></div>
                    <div className="crawl-table-desc"> <Descriptions bordered
                        column={2}
                        size="middle"
@@ -46,7 +81,11 @@ export default class CrawlTableShow extends Component {
                              >{'policy'}</Descriptions.Item>
                     </Descriptions>
                     </div>
-                <EditableTable />
+                <EditableTable type='add' name={this.state.selectVal}  dataSource={this.state.tableData} 
+                count={this.state.tableData.length>0 ? this.state.tableData.slice(-1)[0].key : 0}
+                />
+                </div>
+                : ""}               
             </div>
         )
     }

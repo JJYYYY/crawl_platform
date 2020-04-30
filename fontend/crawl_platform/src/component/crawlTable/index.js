@@ -8,15 +8,20 @@ import CrawlTableAdd from '../../common/crawlTableAdd'
 const { TabPane } = Tabs;
 
 export default class CrawlTable extends Component {
-
+    state={
+        activeKey:1
+    }
 
     callback=(key)=>{
-        console.log(key)
+        this.setState({
+            activeKey:key
+        })
     }
     render() {
         return (
             <div className="crawl-table">
                 <Tabs defaultActiveKey="1"
+                keyboard={ true }
                     onChange={this.callback}
                 >
     <TabPane key="1"
@@ -25,7 +30,7 @@ export default class CrawlTable extends Component {
             查看
         </span>}
     >
-     <CrawlTableShow />
+    {this.state.activeKey==='1' ? <CrawlTableShow />  : <div></div>} 
     </TabPane>
     <TabPane key="2"
         tab={
@@ -35,7 +40,7 @@ export default class CrawlTable extends Component {
             </span>
         }
     >
-      <CrawlTableAdd />
+    {this.state.activeKey==='2' ? <CrawlTableAdd />  : <div></div>} 
     </TabPane>
   </Tabs>,
             </div>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Table, Button} from 'antd';
+import { Table, Button,message} from 'antd';
 import {EditableRow} from './EditableRow'
 import {EditableCell} from './EditableCell'
+import {createTable} from '../../api'
 import './index.less'
 
 export default class EditableTable extends Component {
@@ -42,25 +43,22 @@ export default class EditableTable extends Component {
       ];
       this.state = {
         dataSource: [
-          {
-            key: '0',
-            name: 'Edward King 0',
-            type: '32',
-            explain: 'London, Park Lane no. 0'
-          },
-          {
-            key: '1',
-            name: 'Edward King 1',
-            type: '32',
-            explain: 'London, Park Lane no. 1'
-          }
         ],
-        count: 2
+        count: 0
       };
     }
 
     handleSubmit=()=>{
-
+      if (typeof this.props.changeState==='function'){
+        this.props.changeState()
+      }
+      if (!this.props.name || this.state.dataSource.length===0){
+        message.warning("表名和表字段不能为空")
+        
+      }else{
+      createTable(this.props.name,this.state.dataSource,'post').then((res)=>{
+        res.statusCode==='200' ? message.success("创建成功") : this.props.type==='new' ?  message.warning("该表已存在，无须重复创建") : message.success("修改成功")
+      })}
     }
 
     handleDelete = key => {
@@ -93,6 +91,21 @@ export default class EditableTable extends Component {
         dataSource: newData
       });
     };
+
+
+    componentDidMount(){
+      this.setState({
+        dataSource:this.props.dataSource.length>0 ?  this.props.dataSource : [],
+        count:this.props.count ? this.props.count : 0
+      })
+    }
+
+    componentWillReceiveProps(nextprops){
+      this.setState({
+        dataSource:nextprops.dataSource.length>0 ?  nextprops.dataSource : [],
+        count:nextprops.count ? nextprops.count : 0
+      })
+    }
 
     render() {
       const { dataSource } = this.state;
