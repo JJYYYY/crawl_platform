@@ -17,22 +17,19 @@ export default class CrawlTable extends Component {
             activeKey:key
         })
     }
+
+
+    componentDidMount(){
+    }
+
     render() {
         return (
             <div className="crawl-table">
-                <Tabs defaultActiveKey="1"
+                <Tabs activeKey={this.state.activeKey}
                 keyboard={ true }
                     onChange={this.callback}
                 >
-    <TabPane key="1"
-        tab={<span>
-            <EyeTwoTone />
-            查看
-        </span>}
-    >
-    {this.state.activeKey==='1' ? <CrawlTableShow />  : <div></div>} 
-    </TabPane>
-    <TabPane key="2"
+                     <TabPane key="1"
         tab={
             <span>
                 <FileAddTwoTone />
@@ -40,9 +37,18 @@ export default class CrawlTable extends Component {
             </span>
         }
     >
-    {this.state.activeKey==='2' ? <CrawlTableAdd />  : <div></div>} 
+    {this.state.activeKey==='1' ? <CrawlTableAdd />  : <div></div>} 
     </TabPane>
-  </Tabs>,
+    <TabPane key="2"
+        tab={<span>
+            <EyeTwoTone />
+            查看
+        </span>}
+    >
+    {this.state.activeKey==='2' ? <CrawlTableShow />  : <div></div>} 
+    </TabPane>
+   
+  </Tabs>
             </div>
         )
     }

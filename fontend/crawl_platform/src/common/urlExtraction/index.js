@@ -1,29 +1,31 @@
 import React, { Component } from 'react'
 import { Input,Switch } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import cookie from 'react-cookies'
 import WrapperSelect from  '../wrapperSelect'
 import DebugButton from '../debugButton'
 import './index.less'
 
 export default class UrlExtraction extends Component {
     state={
-        selectVal:'css',
-        checked:false
+        urlExtractionType:'css',
+        urlExtractionJsonChecked:false,
+        urlExtractionRule:''
     }
     handleChange=(val)=>{
         this.setState({
-            selectVal:val
+            urlExtractionType:val
         })
     }
     onChange=(checked) =>{
         this.setState({
-            checked:checked
+            urlExtractionJsonChecked:checked
         })
     }
 
     getText=()=>{
         let result=''
-        switch(this.state.selectVal){
+        switch(this.state.urlExtractionType){
             case 'css':
                 result='css选择器，用$$分隔，前面为选出含有所有url的选择器，后面为提取url的选择器'
                 break
@@ -38,6 +40,39 @@ export default class UrlExtraction extends Component {
         }
         return result
     }
+
+    handleInputChange=(e)=>{
+        this.setState({
+            urlExtractionRule:e.target.Value
+        })
+    }
+
+    handleClick=()=>{
+        cookie.save("urlExtractionType",this.state.urlExtractionType)
+        if (this.state.urlExtractionType!=='json'){
+            cookie.save("urlExtractionRule",this.state.urlExtractionRule)
+        }else{
+            if (this.state.urlExtractionJsonChecked){
+                cookie.save("urlExtractionJsonChecked",this.state.urlExtractionJsonChecked)
+            }
+            else{
+                cookie.save("urlExtractionJsonChecked",this.state.urlExtractionJsonChecked)
+                cookie.save("urlExtractionRule",this.state.urlExtractionRule)
+            }
+        }
+    }
+
+    componentDidMount(){
+        let urlExtractionType=cookie.load("urlExtractionType") ? cookie.load("urlExtractionType"):"css"
+        let urlExtractionJsonChecked=cookie.load("urlExtractionJsonChecked") ? cookie.load("urlExtractionJsonChecked") : false
+        let urlExtractionRule=cookie.load('urlExtractionRule') ? cookie.load("urlExtractionRule") : ""
+        this.setState({
+              urlExtractionType,
+            urlExtractionJsonChecked,
+            urlExtractionRule
+        })
+    }
+
     render() {
         const data=[{value:'css',text:'CSS'},{value:'re',text:'正则'},{value:'json',text:'Json'}]
         return (
@@ -51,8 +86,10 @@ export default class UrlExtraction extends Component {
                     width="123"
                 />
                 </div>
-                {this.state.selectVal!=='json' ?
-                <div className="first-request-url-extraction-input"><Input placeholder={this.getText()}/><DebugButton text="调试"/></div>
+                <div className='input-explain'>{this.getText()}</div>
+                {this.state.urlExtractionType!=='json' ?
+                <div className="first-request-url-extraction-input"><Input onChange={this.handleInputChange}/>
+                <DebugButton  onClick={this.handleClick} text="调试"/></div>
                 :
                 <div className="first-request-url-extraction">
                 <Switch
@@ -61,10 +98,10 @@ export default class UrlExtraction extends Component {
                     onChange={this.onChange}
                     unCheckedChildren={<CloseOutlined />}
                 ></Switch>
-                <span>是否直接提取数据</span>{this.state.checked ? '' :
+                <span>是否直接提取数据</span>{this.state.urlExtractionJsonChecked ? '' :
                  <div className="first-request-url-extraction-input">
-                     <Input  placeholder={this.getText()} />
-                     <DebugButton text="调试"/>
+                     <Input onChange={this.handleInputChange}/>
+                     <DebugButton onClick={this.handleClick}  text="调试"/>
                      </div>}
                      </div>}
             </div>

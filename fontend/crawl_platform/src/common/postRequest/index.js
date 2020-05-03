@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Input,message} from 'antd';
 import cookie from 'react-cookies'
 import DetermineButton from '../determineButton'
+import WrapperSelect from '../wrapperSelect'
 import DebugButton from '../debugButton'
 import './index.less'
 
@@ -11,7 +12,8 @@ export default class PostRequest extends Component {
         postUrl:"",
         postData:"",
         startNum:"",
-        endNum:""
+        endNum:"",
+        crawlFirstRequestEconding:''
     }
 
        //改变getUrl
@@ -43,7 +45,7 @@ export default class PostRequest extends Component {
         })
     }
 
-
+    
     //将数据写入cookie
     savepostData=()=>{
         if (this.state.getUrl && this.state.startNum && this.state.endNum && this.state.postData){
@@ -51,6 +53,7 @@ export default class PostRequest extends Component {
             cookie.save("postData",this.state.postData)
             cookie.save("startNum",this.state.startNum)
             cookie.save("endNum",this.state.endNum)
+            cookie.save("crawlFirstRequestEconding",this.state.crawlFirstRequestEconding)
             return true
             }
         else{
@@ -79,6 +82,10 @@ export default class PostRequest extends Component {
                 requestGetActive:!this.state.requestGetActive
             })
         }}
+        debug("postRequestListUrl").then(res=>{  
+            <ShowResult text={res.data} />
+        })
+
     }
 
 
@@ -88,11 +95,16 @@ export default class PostRequest extends Component {
            getUrl:cookie.load("getUrl") ? cookie.load("getUrl") :preState.getUrl,
            postData:cookie.load("postData") ? cookie.load("postData") :preState.postData,
            startNum:cookie.load("startNum") ? cookie.load("startNum") :preState.startNum,
-           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum
+           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum, 
+           crawlFirstRequestEconding:cookie.load("crawlFirstRequestEconding") ? cookie.load("crawlFirstRequestEconding") : "utf-8"
        }))
     }
 
-
+    handleChange=(value)=>{
+        this.setState({
+            crawlFirstRequestEconding:value
+        })
+    }
     render() {
         return (
             <div className="crawl-first-request-post-item">
@@ -126,6 +138,25 @@ export default class PostRequest extends Component {
                 />
             </div>
             <div className="crawl-first-request-button">
+            <div className='url-encoding'>
+            <span>网页编码方式</span>
+            <WrapperSelect
+                     data={[
+                        {value:'utf-8',
+                            text:'utf-8'
+                        },
+                        {
+                            value:'gbk',
+                            text:'gbk'
+                        },{
+                            value:'gb2312',
+                            text:'gb2312'
+                        }
+                    ]}
+                     value={this.state.crawlFirstRequestEconding}
+                     onChange={this.handleChange}
+                     width="80"
+                 /></div>
             <DetermineButton className="crawl-first-request-post-button"
                 onClick={this.handleClick}
                 text={this.state.requestPostActive ? '编辑' :'确定'}

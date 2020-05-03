@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 import WrapperRadio from '../wrapperRadio'
 import { BugTwoTone } from '@ant-design/icons';
 import cookie from 'react-cookies'
@@ -28,12 +28,21 @@ export default class CreateTabs extends Component {
 
   //爬虫名字
   handleCrawlNameClick = () => {
+    
     let state = !this.state.crawlNameState;
     this.setState({
       crawlNameState: state,
     },()=>{
       if(!this.state.crawlNameState)
-      {cookie.save("name",this.state.name)}
+      {
+        if(!this.state.name){
+          message.warning("爬虫名不能为空")
+          this.setState({
+            crawlNameState:true
+          })
+          return
+        }
+        cookie.save("name",this.state.name)}
     });
     };
 
@@ -61,7 +70,6 @@ export default class CreateTabs extends Component {
   
   componentDidMount(){//从cookie加载数据
     let name=cookie.load("name")
-    console.log("name",name)
     this.setState({
       name
     },()=>{//如果input的内容不为空，更改状态

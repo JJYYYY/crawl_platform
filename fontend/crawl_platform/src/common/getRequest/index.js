@@ -2,7 +2,10 @@ import React, { Component } from 'react'
 import { Input,message } from 'antd';
 import DetermineButton from '../determineButton'
 import cookie from 'react-cookies'
+import WrapperSelect from '../wrapperSelect'
+import { debug } from '../../api'
 import DebugButton from '../debugButton'
+import ShowResult from '../showResult'
 import './index.less'
 
 export default class GetRequest extends Component {
@@ -10,7 +13,8 @@ export default class GetRequest extends Component {
         requestGetActive:false,
         getUrl:"",
         startNum:"",
-        endNum:""
+        endNum:"",
+        crawlFirstRequestEconding:""
     }
 
 
@@ -43,6 +47,7 @@ export default class GetRequest extends Component {
             cookie.save("getUrl",this.state.getUrl)
             cookie.save("startNum",this.state.startNum)
             cookie.save("endNum",this.state.endNum)
+            cookie.save("crawlFirstRequestEconding",this.state.crawlFirstRequestEconding)
             return true
             }
         else{
@@ -71,15 +76,23 @@ export default class GetRequest extends Component {
                 requestGetActive:!this.state.requestGetActive
             })
         }}
+        debug("getRequestListUrl").then(res=>{  
+            <ShowResult text={res.data} />
+        })
     }
 
-
+    handleChange=(value)=>{
+        this.setState({
+            crawlFirstRequestEconding:value
+        })
+    }
 
     componentDidMount(){ //加载cookie中的数据
        this.setState((preState,props)=>({
            getUrl:cookie.load("getUrl") ? cookie.load("getUrl") :preState.getUrl,
            startNum:cookie.load("startNum") ? cookie.load("startNum") :preState.startNum,
-           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum
+           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum,
+           crawlFirstRequestEconding:cookie.load("crawlFirstRequestEconding") ? cookie.load("crawlFirstRequestEconding") :"utf-8"
        }))
     }
 
@@ -108,6 +121,25 @@ export default class GetRequest extends Component {
                 />
             </div>
             <div className="crawl-first-request-button">
+                <div className='url-encoding'>
+            <span>网页编码方式</span>
+            <WrapperSelect
+                     data={[
+                        {value:'utf-8',
+                            text:'utf-8'
+                        },
+                        {
+                            value:'gbk',
+                            text:'gbk'
+                        },{
+                            value:'gb2312',
+                            text:'gb2312'
+                        }
+                    ]}
+                     value={this.state.crawlFirstRequestEconding}
+                     onChange={this.handleChange}
+                     width="80"
+                 /></div>
             <DetermineButton
                 onClick={this.handleClick}
                 text={this.state.requestPostActive ? '编辑' :'确定'}

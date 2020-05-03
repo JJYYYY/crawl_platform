@@ -5,6 +5,7 @@ from app.models import TableStruct
 from app import db
 import datetime
 import time
+from app.utils import getRequestListUrl,postRequestListUrl
 
 sucessCode={
     "callStatus":'sucess',
@@ -13,14 +14,86 @@ sucessCode={
     "statusCode":200
 }
 
-# @api.route("/issaved",methods=["POST"])
-# def isSaved():
-#     data=json.loads(request.get_data(as_text=True))
-#     saved=IsSaved.query.filter_by(category=data.get("type")).first()
-#     if saved:
-#         return jsonify({"data":saved})
-#     else:
-#         return jsonify({"data":0})
+
+@api.route("/debug",methods=["GET","POST"])
+def debug():
+    startTime=time.time()
+    if request.method=='GET':
+        debugType=request.args.get('type')
+        try:
+            name = request.cookies.get("name")
+            if not name:
+                sucessCode = {
+                    "callStatus": 'sucess',
+                    "message": "缺少爬虫名字",
+                    "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    "statusCode": "200",
+                    "cost": str((time.time() - startTime)) + 'ms'
+                }
+                return jsonify(sucessCode)
+            else:
+               pass
+        except:
+            sucessCode = {
+                "callStatus": 'sucess',
+                "message": "缺少爬虫名字",
+                "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                "statusCode": "200",
+                "cost": str((time.time() - startTime)) + 'ms'
+            }
+            return jsonify(sucessCode)
+        if debugType=='getRequestListUrl':
+            getUrl=request.cookies.get("getUrl")
+            startNum=request.cookies.get("startNum")
+            code=request.cookies.get("crawlFirstRequestEconding")
+            data=request.cookies.get("postData")
+            url=getUrl.replace("%s",startNum)
+            result=postRequestListUrl(name,data,url,code)
+            if result:
+                sucessCode = {
+                    "callStatus": 'sucess',
+                    "message": "请求成功",
+                    "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    "statusCode": "200",
+                    "data":result,
+                    "cost": str((time.time() - startTime)) + 'ms'
+                }
+                return sucessCode
+            else:
+                sucessCode = {
+                    "callStatus": 'sucess',
+                    "message": "请求失败，请重试",
+                    "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    "statusCode": "404",
+                    "cost": str((time.time() - startTime)) + 'ms'
+                }
+                return sucessCode
+        if debugType=='postRequestListUrl':
+            postUrl = request.cookies.get("getUrl")
+            startNum = request.cookies.get("startNum")
+            code = request.cookies.get("crawlFirstRequestEconding")
+            data=request.cookies.get("postData")
+            url = postUrl.replace("%s", startNum)
+            result = postRequestListUrl(name, url,data, code)
+            if result:
+                sucessCode = {
+                    "callStatus": 'sucess',
+                    "message": "请求成功",
+                    "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    "statusCode": "200",
+                    "data": result,
+                    "cost": str((time.time() - startTime)) + 'ms'
+                }
+                return sucessCode
+            else:
+                sucessCode = {
+                    "callStatus": 'sucess',
+                    "message": "请求失败，请重试",
+                    "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    "statusCode": "404",
+                    "cost": str((time.time() - startTime)) + 'ms'
+                }
+                return sucessCode
 
 @api.route("/table", methods=["GET",'POST'])
 def table():

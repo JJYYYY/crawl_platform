@@ -27,7 +27,6 @@ export default class CrawlTableShow extends Component {
     }
 
 componentDidMount(){
-    console.log('香蕉再次进来时不会请求接口')
     getTable().then(
         res=>{
             this.setState({

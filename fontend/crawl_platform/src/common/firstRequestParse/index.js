@@ -3,6 +3,7 @@ import DataPreProcess from '../dataPreProcess'
 import UrlExtraction from '../urlExtraction'
 import DetermineButton from '../determineButton'
 import DataAfterProcess from '../dataAfterProcess'
+import DebugButton from '../debugButton'
 import './index.less'
 
 export default class FirstRequestParse extends Component {
@@ -23,8 +24,7 @@ export default class FirstRequestParse extends Component {
                 <UrlExtraction />
                 <DataAfterProcess />
                <div className="submit"> <DetermineButton
-                   text="确定"
-                                        />
+                   text="确定" /><DebugButton  onClick={this.handleClick}  text="调试"/>
                 </div>
             </div>
         )

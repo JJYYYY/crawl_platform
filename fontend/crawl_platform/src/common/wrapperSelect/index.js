@@ -16,6 +16,7 @@ export default class WrapperSelect extends Component {
     render() {
         return (
             <Select defaultValue={this.props.defaultValue}
+                value={this.props.value}
                 onChange={(value)=>this.props.onChange(value)}
                 style={{ width: this.props.width }}
             >
