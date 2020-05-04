@@ -1,33 +1,35 @@
 import React, { Component } from 'react'
-import { CloseCircleTwoTone } from 'antd'
+import {inject,observer} from 'mobx-react'
+import { CloseCircleTwoTone } from 'antd';
 
-export default class ShowResult extends Component {
-    state={
-        active:false
+
+export default @inject(
+    stores=>({
+        text:stores.debug.text,
+        active:stores.debug.active,
+        changeActive:stores.debug.changeActive
+    })
+)
+@observer
+
+ class ShowResult extends Component {
+
+
+    handleClick=()=>{   
+      this.props.changeActive()
     }
 
-    componentWillReceiveProps(nextProps){
-        this.setState({
-            active:true
-        })
-    }
 
-    handleClick=()=>{
-        this.setState({
-            active:false
-        })
-    }
-    
     render() {
-        const {active}=this.state
-        return 
-            (
-                <div className='show-result'>
-                    { this.state.active ? (<div className='show-result-content'>
+        return (
+             (<div className='show-result'>
+             
+                    { this.props.active ? <div className='show-result-content'>
                         <CloseCircleTwoTone  onClick={this.handleClick}/>
             <div className='content'>{ this.props.text}</div>
-                    </div>) : ""}
-                </div>
-            )
+                    </div> : ""}
+                </div> )
+        )
+          
 }
 }

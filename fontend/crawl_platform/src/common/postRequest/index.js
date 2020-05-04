@@ -1,12 +1,24 @@
 import React, { Component } from 'react'
 import { Input,message} from 'antd';
+import {inject,observer} from 'mobx-react'
 import cookie from 'react-cookies'
 import DetermineButton from '../determineButton'
 import WrapperSelect from '../wrapperSelect'
 import DebugButton from '../debugButton'
+import {debug} from '../../api'
 import './index.less'
 
-export default class PostRequest extends Component {
+
+export default @inject(
+    stores=>({
+        changeActive:stores.debug.changeActive,
+        changeText:stores.debug.changeText
+    })
+)
+@observer
+
+
+class PostRequest extends Component {
     state={
         requestPostActive:false,
         postUrl:"",
@@ -83,7 +95,8 @@ export default class PostRequest extends Component {
             })
         }}
         debug("postRequestListUrl").then(res=>{  
-            <ShowResult text={res.data} />
+            this.props.changeActive()
+            this.props.changeText(res.data)
         })
 
     }

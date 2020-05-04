@@ -1,14 +1,23 @@
 import React, { Component } from 'react'
 import { Input,message } from 'antd';
+import {inject,observer} from 'mobx-react'
 import DetermineButton from '../determineButton'
 import cookie from 'react-cookies'
 import WrapperSelect from '../wrapperSelect'
 import { debug } from '../../api'
 import DebugButton from '../debugButton'
-import ShowResult from '../showResult'
 import './index.less'
 
-export default class GetRequest extends Component {
+
+
+export default @inject(
+    stores=>({
+        changeActive:stores.debug.changeActive,
+        changeText:stores.debug.changeText
+    })
+)
+@observer
+ class GetRequest extends Component {
     state={
         requestGetActive:false,
         getUrl:"",
@@ -77,7 +86,8 @@ export default class GetRequest extends Component {
             })
         }}
         debug("getRequestListUrl").then(res=>{  
-            <ShowResult text={res.data} />
+           this.props.changeActive()
+           this.props.changeText(res.data)
         })
     }
 
