@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
+import {CloseSquareTwoTone} from '@ant-design/icons'
 import {inject,observer} from 'mobx-react'
-import { CloseCircleTwoTone } from 'antd';
-
+import './index.less'
 
 export default @inject(
     stores=>({
@@ -15,21 +15,25 @@ export default @inject(
  class ShowResult extends Component {
 
 
-    handleClick=()=>{   
+    handleClick=()=>{
       this.props.changeActive()
     }
 
 
     render() {
         return (
-             (<div className='show-result'>
-             
-                    { this.props.active ? <div className='show-result-content'>
-                        <CloseCircleTwoTone  onClick={this.handleClick}/>
-            <div className='content'>{ this.props.text}</div>
-                    </div> : ""}
+             (<div className="show-result">
+
+                    {this.props.active ? <div className="show-result-content">
+                       <div style={{display:'flex',justifyContent:'flex-end'}}> <CloseSquareTwoTone onClick={this.handleClick}
+                           style={{ fontSize: '20px',marginRight:'10px',marginTop:'10px' }}
+                                                                                /></div>
+            <div className="content"
+                dangerouslySetInnerHTML={{__html:this.props.text }}
+            />
+                    </div> : ''}
                 </div> )
         )
-          
+
 }
 }

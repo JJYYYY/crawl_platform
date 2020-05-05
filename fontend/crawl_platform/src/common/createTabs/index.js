@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Input, message } from 'antd';
 import WrapperRadio from '../wrapperRadio'
 import { BugTwoTone } from '@ant-design/icons';
-import cookie from 'react-cookies'
 import GetRequest from '../getRequest';
 import PostRequest from '../postRequest';
 import FirsetRequestParse from '../firstRequestParse';
@@ -15,9 +14,25 @@ export default class CreateTabs extends Component {
     crawlNameState: true,
     crawlFirstRequestValue: '请求方式',
     requestType: 'GET',
-    name:"",
+    name:'',
     disable:false
   };
+
+
+
+    componentDidMount(){//从cookie加载数据
+    let name=localStorage.getItem('name')
+    this.setState({
+      name
+    },()=>{//如果input的内容不为空，更改状态
+      if(this.state.name){
+        this.setState({
+          crawlNameState:false
+        })
+      }
+    })
+  }
+
 
   changeRadioState=()=>{ //更改单选框是否可以切换
     this.setState({
@@ -28,21 +43,21 @@ export default class CreateTabs extends Component {
 
   //爬虫名字
   handleCrawlNameClick = () => {
-    
+
     let state = !this.state.crawlNameState;
     this.setState({
-      crawlNameState: state,
+      crawlNameState: state
     },()=>{
       if(!this.state.crawlNameState)
       {
         if(!this.state.name){
-          message.warning("爬虫名不能为空")
+          message.warning('爬虫名不能为空')
           this.setState({
             crawlNameState:true
           })
           return
         }
-        cookie.save("name",this.state.name)}
+        localStorage.setItem('name',this.state.name)}
     });
     };
 
@@ -67,33 +82,20 @@ export default class CreateTabs extends Component {
       name
     })
   }
-  
-  componentDidMount(){//从cookie加载数据
-    let name=cookie.load("name")
-    this.setState({
-      name
-    },()=>{//如果input的内容不为空，更改状态
-      if(this.state.name){
-        this.setState({
-          crawlNameState:false
-        })
-      }
-    })
-  }
-  
+
+
   render() {
-    
     const data=[{value:'GET',text:'GET'},{value:'POST',text:'POST'}]
     return (
       <div className="crawl-content">
         <div className="crawl-name">
           <Input
-            value={this.state.name}
-              onChange={this.handleChange}
               className="crawl-name-input"
               disabled={!this.state.crawlNameState}
+              onChange={this.handleChange}
               placeholder="爬虫名字"
               prefix={<BugTwoTone />}
+              value={this.state.name}
           />
 
 
@@ -108,9 +110,9 @@ export default class CreateTabs extends Component {
           <div className="crawl-first-step-name">第一步</div>
           <div className="crawl-first-step-content">
           <WrapperRadio buttonStyle="solid"
-              disabled={this.state.disabled}
               data={data}
               defaultValue={this.state.requestType}
+              disabled={this.state.disabled}
               onChange={this.handleRadioChange}
           />
             {this.state.requestType === 'GET' ? (

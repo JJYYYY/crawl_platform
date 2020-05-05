@@ -5,7 +5,7 @@ from app.models import TableStruct
 from app import db
 import datetime
 import time
-from app.utils import getRequestListUrl,postRequestListUrl
+from app.utils import getRequestListUrl,postRequestListUrl,parseData
 
 sucessCode={
     "callStatus":'sucess',
@@ -13,15 +13,23 @@ sucessCode={
     "rtnTime":datetime.datetime.now(),
     "statusCode":200
 }
-
+@api.after_request
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin']="http://localhost:3000"
+    response.headers["Access-Control-Allow-Credentials"] = True
+    response.headers['Access-Control-Allow-Headers']='X-Requested-with,Content-Type'
+    response.headers['Access-Control-Allow-Method']='GET,POST'
+    return response
 
 @api.route("/debug",methods=["GET","POST"])
 def debug():
     startTime=time.time()
-    if request.method=='GET':
-        debugType=request.args.get('type')
+    if request.method=='POST':
+        data = json.loads(request.get_data(as_text=True, parse_form_data=True))
+        debugType=data['type']
+        data=data["data"]
         try:
-            name = request.cookies.get("name")
+            name =data['name']
             if not name:
                 sucessCode = {
                     "callStatus": 'sucess',
@@ -33,22 +41,29 @@ def debug():
                 return jsonify(sucessCode)
             else:
                pass
-        except:
+        except Exception as e:
             sucessCode = {
                 "callStatus": 'sucess',
-                "message": "缺少爬虫名字",
+                "message": repr(e),
                 "rtnTime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 "statusCode": "200",
                 "cost": str((time.time() - startTime)) + 'ms'
             }
             return jsonify(sucessCode)
         if debugType=='getRequestListUrl':
-            getUrl=request.cookies.get("getUrl")
-            startNum=request.cookies.get("startNum")
-            code=request.cookies.get("crawlFirstRequestEconding")
-            data=request.cookies.get("postData")
+            getUrl=data["getUrl"]
+            if ";" in getUrl:
+                getUrl=getUrl.split("$")[0]
+            startNum=data["startNum"]
+            code=data["crawlGetFirstRequestEconding"]
+            params=json.loads(data['params']) if parseData(data['params']) else parseData(data['params'])
+            formula=json.loads(data['formula']) if data['formula'] else data['formula']
+            if params and formula:
+                for k in params.keys():
+                    if k in formula:
+                        params[k] = eval(formula[k].replace('%s', startNum))
             url=getUrl.replace("%s",startNum)
-            result=postRequestListUrl(name,data,url,code)
+            result=getRequestListUrl(name,url,code,params)
             if result:
                 sucessCode = {
                     "callStatus": 'sucess',
@@ -69,12 +84,29 @@ def debug():
                 }
                 return sucessCode
         if debugType=='postRequestListUrl':
-            postUrl = request.cookies.get("getUrl")
-            startNum = request.cookies.get("startNum")
-            code = request.cookies.get("crawlFirstRequestEconding")
-            data=request.cookies.get("postData")
+            postUrl = data["postUrl"]
+            if '$' in postUrl:
+                postUrl=postUrl.split('$')[0]
+            startNum = data["startNum"]
+            code = data["crawlFirstRequestEconding"]
+            postData=parseData(data["postData"])
+            params=parseData(data['params'])
+            formula=data['formula']
+            if '$' in formula:
+                params_formula=json.loads(formula.split('$')[0]) if formula.split('$')[0] else formula.split('$')[0]
+                data_formula=json.loads(formula.split('$')[1]) if formula.split('$')[1] else formula.split('$')[1]
+            else:
+                params_formula=json.loads(formula)
+            if params and params_formula:
+                for k in params.keys():
+                    if k in params_formula:
+                        params[k]=eval(params_formula[k].replace('%s',startNum))
+            if postData and "data_formula" in locals() and data_formula:
+                for k in postData.keys():
+                    if k in data_formula:
+                        postData[k] = eval(data_formula[k].replace('%s', startNum))
             url = postUrl.replace("%s", startNum)
-            result = postRequestListUrl(name, url,data, code)
+            result = postRequestListUrl(name, url,postData, code,params)
             if result:
                 sucessCode = {
                     "callStatus": 'sucess',

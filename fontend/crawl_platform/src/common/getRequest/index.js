@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Input,message } from 'antd';
 import {inject,observer} from 'mobx-react'
 import DetermineButton from '../determineButton'
-import cookie from 'react-cookies'
 import WrapperSelect from '../wrapperSelect'
 import { debug } from '../../api'
 import DebugButton from '../debugButton'
@@ -20,11 +19,24 @@ export default @inject(
  class GetRequest extends Component {
     state={
         requestGetActive:false,
-        getUrl:"",
-        startNum:"",
-        endNum:"",
-        crawlFirstRequestEconding:""
+        getUrl:'',
+        startNum:'',
+        endNum:'',
+        crawlGetFirstRequestEconding:'utf-8',
+        getFormula:'',
+        getParams:''
     }
+
+    componentDidMount(){ //加载cookie中的数据
+        this.setState((preState)=>({
+            getUrl:localStorage.getItem('getUrl') ? localStorage.getItem('getUrl') :preState.getUrl,
+            startNum:localStorage.getItem('startNum') ? localStorage.getItem('startNum') :preState.startNum,
+            endNum:localStorage.getItem('endNum') ? localStorage.getItem('endNum') :preState.endNum,
+            getFormula:localStorage.getItem('getFormula') ? localStorage.getItem('getFormula') :preState.getFormula,
+            getParams:localStorage.getItem('getParams') ? localStorage.getItem('getParams') :preState.getParams,
+            crawlGetFirstRequestEconding:localStorage.getItem('crawlGetFirstRequestEconding') ? localStorage.getItem('crawlGetFirstRequestEconding') :preState.crawlGetFirstRequestEconding
+        }))
+     }
 
 
     //改变getUrl
@@ -49,19 +61,27 @@ export default @inject(
         })
     }
 
+    handleFormula=(e)=>{
+        this.setState({
+           getFormula:e.target.value
+        })
+    }
 
     //将数据写入cookie
     saveData=()=>{
+        console.log('saveData')
         if (this.state.getUrl && this.state.startNum && this.state.endNum ){
-            cookie.save("getUrl",this.state.getUrl)
-            cookie.save("startNum",this.state.startNum)
-            cookie.save("endNum",this.state.endNum)
-            cookie.save("crawlFirstRequestEconding",this.state.crawlFirstRequestEconding)
+            localStorage.setItem('getUrl',this.state.getUrl)
+            localStorage.setItem('startNum',this.state.startNum)
+            localStorage.setItem('endNum',this.state.endNum)
+            localStorage.setItem('getParams',this.state.getParams)
+            localStorage.setItem('getFormula',this.state.getFormula)
+            localStorage.setItem('crawlGetFirstRequestEconding',this.state.crawlGetFirstRequestEconding)
             return true
             }
         else{
-            message.warning("您还有未添加的项，请补充完整");
-             }   
+            message.warning('您还有未添加的项，请补充完整');
+             }
     }
 
     handleClick=()=>{//点击确定按钮
@@ -74,9 +94,14 @@ export default @inject(
             this.props.changeRadioState()
         })}
     }
-
+    handleParams=(e)=>{
+        this.setState({
+            getParams:e.target.value
+        })
+    }
 
     handleDebugClick=()=>{ //点击调试按钮
+        console.log('get')
         let result=this.saveData()
         if (result){
         if(!this.state.requestGetActive){
@@ -85,56 +110,70 @@ export default @inject(
                 requestGetActive:!this.state.requestGetActive
             })
         }}
-        debug("getRequestListUrl").then(res=>{  
+        if(!localStorage.getItem('name')){
+            message.warning('请填写爬虫名字')
+        }else{
+        debug('getRequestListUrl',
+        {name:localStorage.getItem('name'),getUrl:this.state.getUrl,startNum:this.state.startNum,crawlGetFirstRequestEconding:this.state.crawlGetFirstRequestEconding,formula:this.state.getFormula,params:this.state.getParams}).then(res=>{
            this.props.changeActive()
            this.props.changeText(res.data)
+           localStorage.setItem('getRequestListUrlResponse',res.data)
         })
+    }
     }
 
     handleChange=(value)=>{
         this.setState({
-            crawlFirstRequestEconding:value
+            crawlGetFirstRequestEconding:value
         })
     }
 
-    componentDidMount(){ //加载cookie中的数据
-       this.setState((preState,props)=>({
-           getUrl:cookie.load("getUrl") ? cookie.load("getUrl") :preState.getUrl,
-           startNum:cookie.load("startNum") ? cookie.load("startNum") :preState.startNum,
-           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum,
-           crawlFirstRequestEconding:cookie.load("crawlFirstRequestEconding") ? cookie.load("crawlFirstRequestEconding") :"utf-8"
-       }))
-    }
 
     render() {
+        console.log('code',this.state.crawlGetFirstRequestEconding)
         return (
             <div className="crawl-first-request-get-item">
                 <div className="crawl-first-request-get-url"><span>URL格式:</span>
                 <Input className="crawl-first-request-get-url-input"
                     disabled={this.state.requestGetActive}
-                    value={this.state.getUrl}
                     onChange={this.handleGetUrl}
                     placeholder="url格式,占位符%s"
+                    value={this.state.getUrl}
                 />
                 </div>
-                <div className="crawl-first-request-get-num"><span>开始页码</span>
+                <div className="crawl-first-request-params"><span>params:</span>
+                <Input className="crawl-first-request-params-input"
+                    disabled={this.state.requestGetActive}
+                    onChange={this.handleParams}
+                    placeholder="params参数"
+                    value={this.state.getParams}
+                />
+                </div>
+                <div className="crawl-first-request-get-num"><span>开始</span>
                 <Input className="crawl-first-request-get-num-input"
+                    disabled={this.state.requestGetActive}
                     onChange={this.handleStartNum}
                     value={this.state.startNum}
-                    disabled={this.state.requestGetActive}
                 />
-                <span>结束页码</span>
+                <span>结束</span>
                 <Input  className="crawl-first-request-get-num-input"
+                    disabled={this.state.requestGetActive}
                     onChange={this.handleEndNum}
                     value={this.state.endNum}
-                    disabled={this.state.requestGetActive}
                 />
+                 <span>公式</span>
+                <Input  className="crawl-first-request-get-num-input"
+                    disabled={this.state.requestGetActive}
+                    onChange={this.handleFormula}
+                    value={this.state.getFormula}
+                />
+
             </div>
             <div className="crawl-first-request-button">
-                <div className='url-encoding'>
+                <div className="url-encoding">
             <span>网页编码方式</span>
             <WrapperSelect
-                     data={[
+                data={[
                         {value:'utf-8',
                             text:'utf-8'
                         },
@@ -146,17 +185,18 @@ export default @inject(
                             text:'gb2312'
                         }
                     ]}
-                     value={this.state.crawlFirstRequestEconding}
-                     onChange={this.handleChange}
-                     width="80"
-                 /></div>
+                disabled={this.state.requestGetActive}
+                onChange={this.handleChange}
+                value={this.state.crawlGetFirstRequestEconding}
+                width="80"
+            /></div>
             <DetermineButton
                 onClick={this.handleClick}
                 text={this.state.requestPostActive ? '编辑' :'确定'}
             />
             <DebugButton
-                text="调试"
                 onClick={this.handleDebugClick}
+                text="调试"
             /></div>
             </div>
         )

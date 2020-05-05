@@ -1,8 +1,8 @@
 import React from 'react';
-import ReactDom from "react-dom";
+import ReactDom from 'react-dom';
 import {Provider} from 'mobx-react'
 import App from './app'
-import {Crawl,Debug} from "./store"
+import {Crawl,Debug} from './store'
 
 const renderMethod=!module.hot ? ReactDom.hydrate : ReactDom.render
 const stores={
@@ -14,7 +14,7 @@ renderMethod(
   <Provider {...stores}>
     <App />
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root')
 )
 
 

@@ -6,6 +6,7 @@ import Home from '../home'
 import Crawl from '../crawl'
 import Data from '../data'
 import NotFound from  '../notfound'
+import ShowResult from '../../common/showResult'
 import './index.less'
 
 const { Content, Footer } = Layout;
@@ -22,6 +23,7 @@ export default class Admin extends Component {
     <Content className="site-layout"
         theme="light"
     >
+<ShowResult />
     <Switch>
               <Redirect exact
                   from="/"

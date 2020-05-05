@@ -1,30 +1,25 @@
 import requests
+import re
 
-
-def get(url,headers,timeout,params=None,code="utf-8",verify=False,**kwargs):
+def get(url,headers,timeout,code,params=None,verify=False,**kwargs):
+    print("code123",code)
     try:
         res=requests.get(url,params=params,headers=headers,timeout=timeout,**kwargs)
-        print(headers)
+        print("res123",res.content.decode(code))
         try:
             return res.content.decode(code)
-        except:
-            try:
-                return res.text
-            except Exception as e:
-                return repr(e)
+        except Exception as e:
+            return repr(e)
     except Exception as e:
         return repr(e)
 
 
-def post(url,headers,timeout,data=None,code="utf-8",verify=False,**kwargs):
+def post(url,headers,timeout,params=None,data=None,code="utf-8",verify=False,**kwargs):
     try:
-        res=requests.post(url,data=data,headers=headers,timeout=timeout,**kwargs)
+        res=requests.post(url,params=params,data=data,headers=headers,timeout=timeout,**kwargs)
         try:
             return res.content.decode(code)
-        except:
-            try:
-                return res.text
-            except Exception as e:
-                return repr(e)
+        except Exception as e:
+            return repr(e)
     except Exception as e:
         return repr(e)

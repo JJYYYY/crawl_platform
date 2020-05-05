@@ -18,7 +18,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "mysql://root:44070423@localhost/upload?charset:utf-8"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:44070423@localhost/crawl?charset:utf-8"
     # SQLALCHEMY_ECHO=True
 
 

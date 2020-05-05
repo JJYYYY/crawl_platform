@@ -5,8 +5,9 @@ from flask_migrate import Migrate, MigrateCommand
 """
 python manage.py db init
 python manage.py db migrate
-python mange.py db upgrade
+python manage.py db upgrade
 python manage.py runserver -p 8000
+虚拟环境，进入script activate
 """
 
 app = create_app("development")

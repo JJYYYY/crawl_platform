@@ -16,9 +16,10 @@ export default class WrapperSelect extends Component {
     render() {
         return (
             <Select defaultValue={this.props.defaultValue}
-                value={this.props.value}
+                disabled={this.props.disabled}
                 onChange={(value)=>this.props.onChange(value)}
                 style={{ width: this.props.width }}
+                value={this.props.value}
             >
                 {this.props.data.map((item,index)=>{
                     return   <Option key={index}

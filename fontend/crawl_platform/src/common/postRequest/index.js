@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Input,message} from 'antd';
 import {inject,observer} from 'mobx-react'
-import cookie from 'react-cookies'
 import DetermineButton from '../determineButton'
 import WrapperSelect from '../wrapperSelect'
 import DebugButton from '../debugButton'
@@ -21,17 +20,31 @@ export default @inject(
 class PostRequest extends Component {
     state={
         requestPostActive:false,
-        postUrl:"",
-        postData:"",
-        startNum:"",
-        endNum:"",
-        crawlFirstRequestEconding:''
+        postUrl:'',
+        postData:'',
+        startNum:'',
+        endNum:'',
+        crawlFirstRequestEconding:'',
+        params:'',
+        formula:''
     }
 
-       //改变getUrl
+    componentDidMount(){ //加载cookie中的数据
+        this.setState((preState)=>({
+            postUrl:localStorage.getItem('postUrl') ? localStorage.getItem('postUrl') :preState.postUrl,
+            params:localStorage.getItem('params') ? localStorage.getItem('params') :preState.params,
+            postData:localStorage.getItem('postData') ? localStorage.getItem('postData') :preState.postData,
+            startNum:localStorage.getItem('startNum') ? localStorage.getItem('startNum') :preState.startNum,
+            endNum:localStorage.getItem('endNum') ? localStorage.getItem('endNum') :preState.endNum,
+            formula:localStorage.getItem('formula') ? localStorage.getItem('formula') :preState.formula,
+            crawlFirstRequestEconding:localStorage.getItem('crawlFirstRequestEconding') ? localStorage.getItem('crawlFirstRequestEconding') : 'utf-8'
+        }))
+     }
+
+       //改变postUrl
        handlePostUrl=(e)=>{
         this.setState({
-            getUrl:e.target.value
+            postUrl:e.target.value
         })
     }
 
@@ -42,6 +55,11 @@ class PostRequest extends Component {
         })
     }
 
+    handleParams=(e)=>{
+        this.setState({
+            params:e.target.value
+        })
+    }
 
     //改变startNum
     handleStartNum=(e)=>{
@@ -56,29 +74,36 @@ class PostRequest extends Component {
             endNum:e.target.value
         })
     }
+    handleFormula=(e)=>{
+        this.setState({
+            formula:e.target.value
+        })
+    }
 
-    
+
     //将数据写入cookie
     savepostData=()=>{
-        if (this.state.getUrl && this.state.startNum && this.state.endNum && this.state.postData){
-            cookie.save("getUrl",this.state.getUrl)
-            cookie.save("postData",this.state.postData)
-            cookie.save("startNum",this.state.startNum)
-            cookie.save("endNum",this.state.endNum)
-            cookie.save("crawlFirstRequestEconding",this.state.crawlFirstRequestEconding)
+        if (this.state.postUrl && this.state.startNum && this.state.endNum && this.state.postData){
+            localStorage.setItem('postUrl',this.state.postUrl)
+            localStorage.setItem('postData',this.state.postData)
+            localStorage.setItem('startNum',this.state.startNum)
+            localStorage.setItem('endNum',this.state.endNum)
+            localStorage.setItem('formula',this.state.formula)
+            localStorage.setItem('params',this.state.params)
+            localStorage.setItem('crawlFirstRequestEconding',this.state.crawlFirstRequestEconding)
             return true
             }
         else{
-            message.warning("您还有未添加的项，请补充完整");
-             }   
+            message.warning('您还有未添加的项，请补充完整');
+             }
     }
 
     handleClick=()=>{//点击确定按钮
         let result=this.savepostData()
         if (result){
-        let state=!this.state.requestGetActive
+        let state=!this.state.requestPostActive
         this.setState({
-            requestGetActive:state
+            requestPostActive:state
         },()=>{
             this.props.changeRadioState()
         })}
@@ -86,32 +111,30 @@ class PostRequest extends Component {
 
 
     handleDebugClick=()=>{ //点击调试按钮
+        console.log('post')
         let result=this.savepostData()
         if (result){
-        if(!this.state.requestGetActive){
+        if(!this.state.requestPostActive){
             this.props.changeRadioState();
             this.setState({
-                requestGetActive:!this.state.requestGetActive
+                requestPostActive:!this.state.requestPostActive
             })
         }}
-        debug("postRequestListUrl").then(res=>{  
+        if(!localStorage.getItem('name')){
+            message.warning('请填写爬虫名字')
+        }else{
+        debug('postRequestListUrl',
+        {name:localStorage.getItem('name'),postUrl:this.state.postUrl,postData:this.state.postData,crawlFirstRequestEconding:this.state.crawlFirstRequestEconding,startNum:this.state.startNum,params:this.state.params,formula:this.state.formula}).then(res=>{
             this.props.changeActive()
             this.props.changeText(res.data)
+            localStorage.setItem('postRequestListUrlResponse',res.data)
         })
-
+    }
     }
 
 
 
-    componentDidMount(){ //加载cookie中的数据
-       this.setState((preState,props)=>({
-           getUrl:cookie.load("getUrl") ? cookie.load("getUrl") :preState.getUrl,
-           postData:cookie.load("postData") ? cookie.load("postData") :preState.postData,
-           startNum:cookie.load("startNum") ? cookie.load("startNum") :preState.startNum,
-           endNum:cookie.load("endNum") ? cookie.load("endNum") :preState.endNum, 
-           crawlFirstRequestEconding:cookie.load("crawlFirstRequestEconding") ? cookie.load("crawlFirstRequestEconding") : "utf-8"
-       }))
-    }
+
 
     handleChange=(value)=>{
         this.setState({
@@ -123,38 +146,53 @@ class PostRequest extends Component {
             <div className="crawl-first-request-post-item">
                 <div className="crawl-first-request-post-url"><span>URL格式:</span>
                 <Input className="crawl-first-request-post-url-input"
-                    value={this.state.postUrl}
-                    onChange={this.handlePostUrl}
                     disabled={this.state.requestPostActive}
+                    onChange={this.handlePostUrl}
                     placeholder="url格式,占位符%s"
+                    value={this.state.postUrl}
+                />
+                </div>
+                <div className="crawl-first-request-post-data"><span>params:</span>
+                <Input className="crawl-first-request-post-data-input"
+                    disabled={this.state.requestPostActive}
+                    onChange={this.handleParams}
+                    placeholder="params参数"
+                    value={this.state.params}
                 />
                 </div>
                 <div className="crawl-first-request-post-data"><span>data:</span>
                 <Input className="crawl-first-request-post-data-input"
-                    value={this.state.postData}
-                    onChange={this.handlepostData}
                     disabled={this.state.requestPostActive}
+                    onChange={this.handlepostData}
                     placeholder="post请求data,占位符%"
+                    value={this.state.postData}
                 />
                 </div>
-                <div className="crawl-first-request-post-num"><span>开始页码</span>
+                <div className="crawl-first-request-post-num"><span>开始</span>
                 <Input className="crawl-first-request-post-num-input"
-                    value={this.state.startNum}
+                    disabled={this.state.requestPostActive}
                     onChange={this.handleStartNum}
-                    disabled={this.state.requestPostActive}
+                    value={this.state.startNum}
                 />
-                <span>结束页码</span>
+                <span>结束</span>
                 <Input  className="crawl-first-request-post-num-input"
-                    value={this.state.endNum}
-                    onChange={this.handleEndNum}
                     disabled={this.state.requestPostActive}
+                    onChange={this.handleEndNum}
+                    value={this.state.endNum}
                 />
+                <span>公式</span>
+                <Input  className="crawl-first-request-post-num-input"
+                    disabled={this.state.requestPostActive}
+                    onChange={this.handleFormula}
+                    value={this.state.formula}
+                />
+
             </div>
             <div className="crawl-first-request-button">
-            <div className='url-encoding'>
+            <div className="url-encoding">
             <span>网页编码方式</span>
             <WrapperSelect
-                     data={[
+                data={[
                         {value:'utf-8',
                             text:'utf-8'
                         },
@@ -166,17 +204,18 @@ class PostRequest extends Component {
                             text:'gb2312'
                         }
                     ]}
-                     value={this.state.crawlFirstRequestEconding}
-                     onChange={this.handleChange}
-                     width="80"
-                 /></div>
+                disabled={this.state.requestPostActive}
+                onChange={this.handleChange}
+                value={this.state.crawlFirstRequestEconding}
+                width="80"
+            /></div>
             <DetermineButton className="crawl-first-request-post-button"
                 onClick={this.handleClick}
                 text={this.state.requestPostActive ? '编辑' :'确定'}
             />
             <DebugButton className="crawl-first-request-post-debug-button"
-                text="调试" 
-                 onClick={this.handleDebugClick}
+                onClick={this.handleDebugClick}
+                text="调试"
             />
             </div>
             </div>

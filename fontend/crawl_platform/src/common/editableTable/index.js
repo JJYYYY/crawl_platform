@@ -48,16 +48,30 @@ export default class EditableTable extends Component {
       };
     }
 
+    componentDidMount(){
+      this.setState({
+        dataSource:this.props.dataSource.length>0 ?  this.props.dataSource : [],
+        count:this.props.count ? this.props.count : 0
+      })
+    }
+
+    componentWillReceiveProps(nextprops){
+      this.setState({
+        dataSource:nextprops.dataSource.length>0 ?  nextprops.dataSource : [],
+        count:nextprops.count ? nextprops.count : 0
+      })
+    }
+
     handleSubmit=()=>{
       if (typeof this.props.changeState==='function'){
         this.props.changeState()
       }
       if (!this.props.name || this.state.dataSource.length===0){
-        message.warning("表名和表字段不能为空")
-        
+        message.warning('表名和表字段不能为空')
+
       }else{
       createTable(this.props.name,this.state.dataSource,'post').then((res)=>{
-        res.statusCode==='200' ? message.success("创建成功") : this.props.type==='new' ?  message.warning("该表已存在，无须重复创建") : message.success("修改成功")
+        res.statusCode==='200' ? message.success('创建成功') : this.props.type==='new' ?  message.warning('该表已存在，无须重复创建') : message.success('修改成功')
       })}
     }
 
@@ -93,19 +107,7 @@ export default class EditableTable extends Component {
     };
 
 
-    componentDidMount(){
-      this.setState({
-        dataSource:this.props.dataSource.length>0 ?  this.props.dataSource : [],
-        count:this.props.count ? this.props.count : 0
-      })
-    }
 
-    componentWillReceiveProps(nextprops){
-      this.setState({
-        dataSource:nextprops.dataSource.length>0 ?  nextprops.dataSource : [],
-        count:nextprops.count ? nextprops.count : 0
-      })
-    }
 
     render() {
       const { dataSource } = this.state;
