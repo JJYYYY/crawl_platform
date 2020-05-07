@@ -24,8 +24,11 @@ export default function ajax(url,data={},type='GET'){
             promise = instance.get(url,{
                 params:data
             })
-        }else{//发送post请求
+        }else  if(type==='POST'){//发送post请求
             promise=instance.post(url,data)
+        }
+        else if(type==='DELETE'){
+            promise=instance.delete(url,{params:data})
         }
         //如果成功了
         promise.then(Response=>{

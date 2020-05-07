@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Input,message} from 'antd';
 import {inject,observer} from 'mobx-react'
-import DetermineButton from '../determineButton'
 import WrapperSelect from '../wrapperSelect'
 import DebugButton from '../debugButton'
 import {debug} from '../../api'
@@ -111,7 +110,6 @@ class PostRequest extends Component {
 
 
     handleDebugClick=()=>{ //点击调试按钮
-        console.log('post')
         let result=this.savepostData()
         if (result){
         if(!this.state.requestPostActive){
@@ -123,11 +121,18 @@ class PostRequest extends Component {
         if(!localStorage.getItem('name')){
             message.warning('请填写爬虫名字')
         }else{
+            localStorage.removeItem("getUrl")
+            localStorage.removeItem("getStartNum")
+            localStorage.removeItem("getEndNum")
+            localStorage.removeItem("getFormula")
+            localStorage.removeItem("getParams")
+            localStorage.removeItem("crawlGetFirstRequestEconding")
         debug('postRequestListUrl',
         {name:localStorage.getItem('name'),postUrl:this.state.postUrl,postData:this.state.postData,crawlFirstRequestEconding:this.state.crawlFirstRequestEconding,startNum:this.state.startNum,params:this.state.params,formula:this.state.formula}).then(res=>{
             this.props.changeActive()
             this.props.changeText(res.data)
-            localStorage.setItem('postRequestListUrlResponse',res.data)
+            localStorage.setItem('requestListUrlResponse',res.data)
+           localStorage.setItem("baseUrl",res.baseUrl)
         })
     }
     }
@@ -209,10 +214,6 @@ class PostRequest extends Component {
                 value={this.state.crawlFirstRequestEconding}
                 width="80"
             /></div>
-            <DetermineButton className="crawl-first-request-post-button"
-                onClick={this.handleClick}
-                text={this.state.requestPostActive ? '编辑' :'确定'}
-            />
             <DebugButton className="crawl-first-request-post-debug-button"
                 onClick={this.handleDebugClick}
                 text="调试"

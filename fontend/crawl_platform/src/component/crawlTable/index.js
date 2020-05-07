@@ -9,7 +9,7 @@ const { TabPane } = Tabs;
 
 export default class CrawlTable extends Component {
     state={
-        activeKey:1
+        activeKey:"1"
     }
 
     callback=(key)=>{
@@ -18,9 +18,6 @@ export default class CrawlTable extends Component {
         })
     }
 
-
-    componentDidMount(){
-    }
 
     render() {
         return (
@@ -37,7 +34,7 @@ export default class CrawlTable extends Component {
             </span>
         }
     >
-    {this.state.activeKey==='1' ? <CrawlTableAdd />  : <div></div>} 
+    {this.state.activeKey==="1" ? <CrawlTableAdd />  : <div></div>} 
     </TabPane>
     <TabPane key="2"
         tab={<span>
@@ -45,7 +42,7 @@ export default class CrawlTable extends Component {
             查看
         </span>}
     >
-    {this.state.activeKey==='2' ? <CrawlTableShow />  : <div></div>} 
+    {this.state.activeKey==="2" ? <CrawlTableShow />  : <div></div>} 
     </TabPane>
    
   </Tabs>

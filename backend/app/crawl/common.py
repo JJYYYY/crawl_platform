@@ -2,7 +2,6 @@ import requests
 import re
 
 def get(url,headers,timeout,code,params=None,verify=False,**kwargs):
-    print("code123",code)
     try:
         res=requests.get(url,params=params,headers=headers,timeout=timeout,**kwargs)
         print("res123",res.content.decode(code))

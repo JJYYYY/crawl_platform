@@ -16,3 +16,11 @@ class TableStruct(db.Model):
     tableName=db.Column(db.String(64),unique=True)
     dataSource=db.Column(db.Text())
     updateTime=db.Column(db.DateTime(),default=datetime.datetime.utcnow())
+
+
+class CrawlParams(db.Model):
+    __tablename__ = 'crawlParams'
+    id = db.Column(db.INTEGER, primary_key=True)
+    name=db.Column(db.String(64),unique=True)
+    params=db.Column(db.Text())
+    updateTime = db.Column(db.DateTime(), default=datetime.datetime.utcnow())

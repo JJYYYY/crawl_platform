@@ -8,11 +8,10 @@ import './index.less'
 export default class EditableTable extends Component {
     constructor(props) {
       super(props);
-      this.columns = [
+      this.columns = this.props.type==='new' ?  [
         {
           title: '字段名',
           dataIndex: 'name',
-          width: '30%',
           editable: true,
           align:'center'
         },
@@ -25,7 +24,8 @@ export default class EditableTable extends Component {
         {
           title: '字段说明',
           dataIndex: 'explain',
-          editable: true
+          editable: true,
+          align:'center'
         },
         {
           title: '操作',
@@ -40,7 +40,26 @@ export default class EditableTable extends Component {
                 >Delete</Button>
             ) : null
         }
-      ];
+      ] :
+      [
+        {
+          title: '字段名',
+          dataIndex: 'name',
+          align:'center'
+        },
+        {
+          title: '字段类型',
+          dataIndex: 'type',
+          align:'center'
+        },
+        {
+          title: '字段说明',
+          dataIndex: 'explain',
+          align:'center'
+        }
+      ]
+
+
       this.state = {
         dataSource: [
         ],
@@ -62,6 +81,8 @@ export default class EditableTable extends Component {
       })
     }
 
+
+
     handleSubmit=()=>{
       if (typeof this.props.changeState==='function'){
         this.props.changeState()
@@ -70,8 +91,8 @@ export default class EditableTable extends Component {
         message.warning('表名和表字段不能为空')
 
       }else{
-      createTable(this.props.name,this.state.dataSource,'post').then((res)=>{
-        res.statusCode==='200' ? message.success('创建成功') : this.props.type==='new' ?  message.warning('该表已存在，无须重复创建') : message.success('修改成功')
+      createTable(this.props.name,this.state.dataSource,'POST').then((res)=>{
+        res.statusCode===200 ? message.success('创建成功') : this.props.type==='new' ?  message.warning('该表已存在，无须重复创建') : message.success('修改成功')
       })}
     }
 
@@ -134,8 +155,10 @@ export default class EditableTable extends Component {
         };
       });
       return (
+        
         <div className="edit-table">
-          <div className="edit-btn">
+      {this.props.type==='new'?
+          <div><div className="edit-btn">
           <Button
               onClick={this.handleAdd}
               type="primary"
@@ -156,7 +179,17 @@ export default class EditableTable extends Component {
               dataSource={dataSource}
               pagination={false}
               rowClassName={() => 'editable-row'}
-          />
+          /></div> :
+          <div>
+      <Table
+          bordered
+          columns={columns}
+          components={components}
+          dataSource={dataSource}
+          pagination={false}
+          rowClassName={() => 'editable-row'}
+      /></div>
+    }
         </div>
       );
     }

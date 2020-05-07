@@ -16,7 +16,6 @@ class LeftNav extends Component {
     }
 
     render() {
-        console.log(this.state.activeKey)
         return (
             <div className="left-nav">
                 <Menu 

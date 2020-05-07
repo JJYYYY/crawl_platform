@@ -23,7 +23,6 @@ export default class EditTable {
 
 
     @action.bound  handleAdd = () => {
-        console.log("123333",this.dataSource)
         const newData = {
           key: this.count,
           name: 'title',

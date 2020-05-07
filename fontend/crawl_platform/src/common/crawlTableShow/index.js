@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Descriptions } from 'antd';
+import { Button,message } from 'antd'
 import WrapperSelect from '../wrapperSelect'
 import EditableTable from '../editableTable'
 import {getTable} from '../../api'
+import {createTable} from '../../api'
 import './index.less'
 
 export default class CrawlTableShow extends Component {
@@ -19,7 +20,6 @@ export default class CrawlTableShow extends Component {
                 res=>{
                     this.setState({
                         tableData:JSON.parse(res.data),
-                        selectVal:this.state.data[0].value
                     })
                 }
             )
@@ -35,9 +35,6 @@ componentDidMount(){
                 if (this.state.data.length>0){
                 getTable(this.state.data[0].value).then(
                     res=>{
-                        // let result=[]
-                        // result.push(res.data)
-                        
                         this.setState({
                             tableData:JSON.parse(res.data),
                             selectVal:this.state.data[0].value
@@ -50,9 +47,34 @@ componentDidMount(){
 }
 
 
-
-
-
+handleDropClick=()=>{
+    createTable(this.state.selectVal,"",'DELETE').then(
+      res=>{
+        if (res.statusCode===200){
+          message.success("删除成功")
+          getTable().then(
+            res=>{
+                this.setState({
+                    data:res.data
+                },()=>{
+                    if (this.state.data.length>0){
+                    getTable(this.state.data[0].value).then(
+                        res=>{
+                            this.setState({
+                                tableData:JSON.parse(res.data),
+                                selectVal:this.state.data[0].value
+                            })
+                        }
+                    )}
+                })
+            }
+        )
+        }else{
+          message.warning("删除失败，请检查该表")
+        }
+      }
+    )
+  }
 
     render() {
         return (
@@ -62,24 +84,18 @@ componentDidMount(){
                  <div className="crawl-table-name">
                  <WrapperSelect
                      data={this.state.data}
-                     defaultValue={this.state.data[0].value}
-                     onChange={this.handleChange}
+                     value={this.state.selectVal}
+                     onChange={(value)=>this.handleChange(value)}
                      width="80"
                  /></div>
-                   <div className="crawl-table-desc"> <Descriptions bordered
-                       column={2}
-                       size="middle"
-                                                      >
-                            <Descriptions.Item label="表名">Cloud Database</Descriptions.Item>
-                            <Descriptions.Item label="数据条数">Prepaid</Descriptions.Item>
-                            <Descriptions.Item label="最新更新时间"
-                                span={2}
-                            >2018-04-24 18:00:00</Descriptions.Item>
-                             <Descriptions.Item label="使用爬虫列表"
-                                 span={2}
-                             >{'policy'}</Descriptions.Item>
-                    </Descriptions>
-                    </div>
+                 <div className="edit-btn" style={{marginTop:"10px"}}>
+          <Button
+          onClick={this.handleDropClick}
+          type="primary"
+      >
+        删除
+      </Button>
+      </div>
                 <EditableTable type='add' name={this.state.selectVal}  dataSource={this.state.tableData} 
                 count={this.state.tableData.length>0 ? this.state.tableData.slice(-1)[0].key : 0}
                 />

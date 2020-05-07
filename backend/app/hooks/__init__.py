@@ -3,3 +3,7 @@
 listPageRequestHooks={
 
 }
+
+detailPaseHooks={
+
+}

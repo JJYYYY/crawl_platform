@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 // import cookie from 'react-cookies'
 import EditableTable from '../editableTable'
 import DetermineButton from '../determineButton'
@@ -14,10 +14,13 @@ export default class CrawlTableAdd extends Component {
     }
 
     handleClick = () => {
+      if (!this.state.val){
+        message.warning("请输入表名")
+      }else{
         let state = !this.state.tableNameState;
         this.setState({
             tableNameState: state
-        });
+        });}
       };
 
     handleChange = (e)=>{

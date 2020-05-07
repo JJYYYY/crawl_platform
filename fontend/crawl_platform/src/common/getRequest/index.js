@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Input,message } from 'antd';
 import {inject,observer} from 'mobx-react'
-import DetermineButton from '../determineButton'
 import WrapperSelect from '../wrapperSelect'
 import { debug } from '../../api'
 import DebugButton from '../debugButton'
@@ -20,8 +19,8 @@ export default @inject(
     state={
         requestGetActive:false,
         getUrl:'',
-        startNum:'',
-        endNum:'',
+        getStartNum:'',
+        getEndNum:'',
         crawlGetFirstRequestEconding:'utf-8',
         getFormula:'',
         getParams:''
@@ -30,8 +29,8 @@ export default @inject(
     componentDidMount(){ //加载cookie中的数据
         this.setState((preState)=>({
             getUrl:localStorage.getItem('getUrl') ? localStorage.getItem('getUrl') :preState.getUrl,
-            startNum:localStorage.getItem('startNum') ? localStorage.getItem('startNum') :preState.startNum,
-            endNum:localStorage.getItem('endNum') ? localStorage.getItem('endNum') :preState.endNum,
+            getStartNum:localStorage.getItem('getStartNum') ? localStorage.getItem('getStartNum') :preState.getStartNum,
+            getEndNum:localStorage.getItem('getEndNum') ? localStorage.getItem('getEndNum') :preState.getEndNum,
             getFormula:localStorage.getItem('getFormula') ? localStorage.getItem('getFormula') :preState.getFormula,
             getParams:localStorage.getItem('getParams') ? localStorage.getItem('getParams') :preState.getParams,
             crawlGetFirstRequestEconding:localStorage.getItem('crawlGetFirstRequestEconding') ? localStorage.getItem('crawlGetFirstRequestEconding') :preState.crawlGetFirstRequestEconding
@@ -47,17 +46,17 @@ export default @inject(
     }
 
 
-    //改变startNum
-    handleStartNum=(e)=>{
+    //改变getStartNum
+    handlegetStartNum=(e)=>{
         this.setState({
-            startNum:e.target.value
+            getStartNum:e.target.value
         })
     }
 
-    //改变endNum
-    handleEndNum=(e)=>{
+    //改变getEndNum
+    handlegetEndNum=(e)=>{
         this.setState({
-            endNum:e.target.value
+            getEndNum:e.target.value
         })
     }
 
@@ -69,11 +68,10 @@ export default @inject(
 
     //将数据写入cookie
     saveData=()=>{
-        console.log('saveData')
-        if (this.state.getUrl && this.state.startNum && this.state.endNum ){
+        if (this.state.getUrl && this.state.getStartNum && this.state.getEndNum ){
             localStorage.setItem('getUrl',this.state.getUrl)
-            localStorage.setItem('startNum',this.state.startNum)
-            localStorage.setItem('endNum',this.state.endNum)
+            localStorage.setItem('getStartNum',this.state.getStartNum)
+            localStorage.setItem('getEndNum',this.state.getEndNum)
             localStorage.setItem('getParams',this.state.getParams)
             localStorage.setItem('getFormula',this.state.getFormula)
             localStorage.setItem('crawlGetFirstRequestEconding',this.state.crawlGetFirstRequestEconding)
@@ -84,16 +82,7 @@ export default @inject(
              }
     }
 
-    handleClick=()=>{//点击确定按钮
-        let result=this.saveData()
-        if (result){
-        let state=!this.state.requestGetActive
-        this.setState({
-            requestGetActive:state
-        },()=>{
-            this.props.changeRadioState()
-        })}
-    }
+   
     handleParams=(e)=>{
         this.setState({
             getParams:e.target.value
@@ -101,7 +90,6 @@ export default @inject(
     }
 
     handleDebugClick=()=>{ //点击调试按钮
-        console.log('get')
         let result=this.saveData()
         if (result){
         if(!this.state.requestGetActive){
@@ -113,11 +101,24 @@ export default @inject(
         if(!localStorage.getItem('name')){
             message.warning('请填写爬虫名字')
         }else{
+            localStorage.removeItem("postUrl")
+            localStorage.removeItem("postData")
+            localStorage.removeItem("startNum")
+            localStorage.removeItem("endNum")
+            localStorage.removeItem("formula")
+            localStorage.removeItem("params")
+            localStorage.removeItem("crawlFirstRequestEconding")
         debug('getRequestListUrl',
-        {name:localStorage.getItem('name'),getUrl:this.state.getUrl,startNum:this.state.startNum,crawlGetFirstRequestEconding:this.state.crawlGetFirstRequestEconding,formula:this.state.getFormula,params:this.state.getParams}).then(res=>{
+        {name:localStorage.getItem('name'),
+        getUrl:this.state.getUrl,
+        getStartNum:this.state.getStartNum,
+        crawlGetFirstRequestEconding:this.state.crawlGetFirstRequestEconding,
+        getFormula:this.state.getFormula,
+        getParams:this.state.getParams}).then(res=>{
            this.props.changeActive()
            this.props.changeText(res.data)
-           localStorage.setItem('getRequestListUrlResponse',res.data)
+           localStorage.setItem('requestListUrlResponse',res.data)
+           localStorage.setItem("baseUrl",res.baseUrl)
         })
     }
     }
@@ -130,7 +131,6 @@ export default @inject(
 
 
     render() {
-        console.log('code',this.state.crawlGetFirstRequestEconding)
         return (
             <div className="crawl-first-request-get-item">
                 <div className="crawl-first-request-get-url"><span>URL格式:</span>
@@ -152,14 +152,14 @@ export default @inject(
                 <div className="crawl-first-request-get-num"><span>开始</span>
                 <Input className="crawl-first-request-get-num-input"
                     disabled={this.state.requestGetActive}
-                    onChange={this.handleStartNum}
-                    value={this.state.startNum}
+                    onChange={this.handlegetStartNum}
+                    value={this.state.getStartNum}
                 />
                 <span>结束</span>
                 <Input  className="crawl-first-request-get-num-input"
                     disabled={this.state.requestGetActive}
-                    onChange={this.handleEndNum}
-                    value={this.state.endNum}
+                    onChange={this.handlegetEndNum}
+                    value={this.state.getEndNum}
                 />
                  <span>公式</span>
                 <Input  className="crawl-first-request-get-num-input"
@@ -190,10 +190,6 @@ export default @inject(
                 value={this.state.crawlGetFirstRequestEconding}
                 width="80"
             /></div>
-            <DetermineButton
-                onClick={this.handleClick}
-                text={this.state.requestPostActive ? '编辑' :'确定'}
-            />
             <DebugButton
                 onClick={this.handleDebugClick}
                 text="调试"

@@ -1,18 +1,26 @@
 import React, { Component } from 'react'
 import { Input, message} from 'antd';
 import WrapperSelect from '../wrapperSelect'
-import cookie from 'react-cookies'
 import DebugButton from '../debugButton'
+import {inject,observer} from 'mobx-react'
 import DetermineButton from '../determineButton'
-import {getTable} from '../../api'
+import {getTable,debug} from '../../api'
 import './index.less'
 
-export default class DetailRequestParse extends Component {
+export default @inject(
+    stores=>({
+        changeActive:stores.debug.changeActive,
+        changeText:stores.debug.changeText
+    })
+)
+@observer
+class DetailRequestParse extends Component {
 
     state={
         names:[],
         tables:[],
         selectVal:'',
+        fieldSelectVal:{},
         fieldExtractData:{}
     }
 
@@ -23,22 +31,33 @@ export default class DetailRequestParse extends Component {
             res=>{
                 this.setState({
                     tables:res.data,
-                    selectVal: cookie.load('tableName') ? cookie.load('tableName')  :  res.data.length>0 ? res.data[0].value : ''
+                    selectVal: localStorage.getItem('tableName') ? localStorage.getItem('tableName')  :  res.data.length>0 ? res.data[0].value : ''
                 },()=>{
                     if (this.state.tables.length>0){
-                        cookie.save('tableName',this.state.tables[0].value)
+                        localStorage.setItem('tableName',this.state.tables[0].value)
                     getTable(this.state.tables[0].value).then(
                         res=>{
                             let names=this.getNames(JSON.parse(res.data))
                             this.setState({
                              names
-                            })
+                            },()=>{
+                                let fieldSelectVal=this.state.fieldSelectVal
+                                this.state.names.map(
+                                    item=>
+                                    fieldSelectVal[item]='CSS'
+                                )
+                                this.setState({
+                                    fieldSelectVal
+                                })
+                            }
+                            )
                         }
                     )}
                 }
                 )
     }
     )
+
 }
 
 handleInputChange=(e,index)=>{
@@ -60,7 +79,7 @@ getNames=(data)=>{
 }
 
     handleChange=(value)=>{
-        cookie.save('tableName',value)
+        localStorage.setItem('tableName',value)
         this.setState({
             selectVal:value
         },()=>{getTable(this.state.selectVal).then(res=>{
@@ -73,15 +92,41 @@ getNames=(data)=>{
         )
     }
 
+    handleSelectChange=(index,value)=>{
+        const fieldSelectVal=this.state.fieldSelectVal
+        fieldSelectVal[this.state.names[index]]=value
+        this.setState({
+            fieldSelectVal
+        })
+        localStorage.setItem("fieldSelectVal",fieldSelectVal)
+    }
 
 
     handleClick=(index)=>{
         let inputVal=this.state.fieldExtractData[this.state.names[index]]
         if (!inputVal){
             message.warning('请填写规则再调试')
+            
         }
         else{
-            cookie.save(this.state.names[index],inputVal)
+            const name=localStorage.getItem("name")
+            const detailPageHtml=localStorage.getItem("detailPageHtml")
+            if (!detailPageHtml){
+                message.warning("您还未获取详情页数据")
+                return 
+            }
+            const key=this.state.names[index]
+            const fieldExtractData=this.state.fieldExtractData[key]
+            const fieldSelectVal=this.state.fieldSelectVal[key]
+            const value={}
+            value[key]={fieldExtractData,fieldSelectVal}
+            localStorage.setItem(`${key}_last`,JSON.stringify(value))
+            debug("detailRequestParse",{fieldExtractData,fieldSelectVal,name,detailPageHtml}).then(
+                res=>{
+                    this.props.changeActive()
+                this.props.changeText(res.data)
+                }
+            )
         }
     }
 
@@ -100,19 +145,42 @@ getNames=(data)=>{
                             text:'正则'
                         }
                     ]}
-                defaultValue="css"
-                onChange={(value)=>this.handleChange(value)}
+                value={this.state.fieldSelectVal[item]}
+                onChange={(value)=>this.handleSelectChange(index,value)}
                 width="0.7rem"
             />
-    <Input  defaultValue={cookie.load(this.state.names[index]) ? cookie.load(this.state.names[index]) : ''}
+    <Input  
         onChange={(e)=>{this.handleInputChange(e,index)}}
     /><DebugButton onClick={()=>{this.handleClick(index)}}
         text="调试"
       /></span>
         </div>
     }
+
+
+    handleSubmitClick=()=>{
+        const items=localStorage
+        const name=localStorage.getItem("name")
+        localStorage.removeItem("urls")
+        localStorage.removeItem("requestListUrlResponse")
+        localStorage.removeItem("detailPageHtml")
+        debug("save",{name,items}).then(
+        res=>
+            {
+            if (res.statusCode===200){
+                message.success("保存成功")
+                localStorage.clear()
+            }else{
+                message.warning("存储失败")
+            }
+        }
+        )
+    }
+
+
+
+
     render() {
-        console.log('this.state.fieldExtractData',this.state.fieldExtractData)
         return (
             <div className="detail-request-parse">
                 <div className="detail-request-parse-wrapper">
@@ -128,7 +196,7 @@ getNames=(data)=>{
     {this.state.names.map((item,index)=>{
         return this.renderTags(item,index)
     })}
-    {this.state.names? <div className="submit"><DetermineButton text="确定"/></div>:''}
+    {this.state.names? <div className="submit"><DetermineButton text="确定" onClick={this.handleSubmitClick}/></div>:''}
             </div>
         )
     }

@@ -1,39 +1,49 @@
 import React, { Component } from 'react'
-import { Input,Switch } from 'antd';
+import { Input,Switch, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
-import cookie from 'react-cookies'
+import {inject,observer} from 'mobx-react'
 import WrapperSelect from  '../wrapperSelect'
+import {debug} from '../../api'
 import DebugButton from '../debugButton'
 import './index.less'
 
-export default class UrlExtraction extends Component {
+export default @inject(
+    stores=>({
+        changeActive:stores.debug.changeActive,
+        changeText:stores.debug.changeText
+    })
+)
+@observer
+
+class UrlExtraction extends Component {
     state={
         urlExtractionType:'css',
         urlExtractionJsonChecked:false,
-        urlExtractionRule:''
+        urlExtractionRule:"",
     }
     handleChange=(val)=>{
         this.setState({
-            urlExtractionType:val
+            urlExtractionType:val,
+            urlExtractionRule:''
         })
     }
     onChange=(checked) =>{
         this.setState({
-            urlExtractionJsonChecked:checked
-        })
+            urlExtractionJsonChecked:checked,
+        },()=>{localStorage.setItem("urlExtractionJsonChecked",this.state.urlExtractionJsonChecked)})
     }
 
     getText=()=>{
         let result=''
         switch(this.state.urlExtractionType){
             case 'css':
-                result='css选择器，用$$分隔，前面为选出含有所有url的选择器，后面为提取url的选择器'
+                result='css选择器，用;分隔，前面为选出含有所有url的选择器，后面为提取url的选择器'
                 break
             case 're':
                 result='正则表达式，用于提取所有符合条件url'
                 break;
             case 'json':
-                result='提取json的层级,如.data.datalist,[.url],表示提取data下的datalist中每一项的url字段'
+                result='提取json的层级,如datalist;url,表示提取数据中datalist中每一项的url字段'
                 break
             default:
                 break
@@ -42,30 +52,44 @@ export default class UrlExtraction extends Component {
     }
 
     handleInputChange=(e)=>{
+        let urlExtractionRule=e.target.value
         this.setState({
-            urlExtractionRule:e.target.Value
+            urlExtractionRule
         })
     }
 
     handleClick=()=>{
-        cookie.save("urlExtractionType",this.state.urlExtractionType)
-        if (this.state.urlExtractionType!=='json'){
-            cookie.save("urlExtractionRule",this.state.urlExtractionRule)
-        }else{
-            if (this.state.urlExtractionJsonChecked){
-                cookie.save("urlExtractionJsonChecked",this.state.urlExtractionJsonChecked)
+        localStorage.setItem("urlExtractionType",this.state.urlExtractionType)
+       {
+            localStorage.setItem("urlExtractionRule",this.state.urlExtractionRule)
+            const name=localStorage.getItem("name")
+            const requestListUrlResponse=localStorage.getItem("requestListUrlResponse")
+            const urlExtractionType=this.state.urlExtractionType
+            const urlExtractionRule=localStorage.getItem("urlExtractionRule")
+            const baseUrl=localStorage.getItem("baseUrl")
+            if (!urlExtractionRule){
+                message.warning("请填写提取规则")
             }
-            else{
-                cookie.save("urlExtractionJsonChecked",this.state.urlExtractionJsonChecked)
-                cookie.save("urlExtractionRule",this.state.urlExtractionRule)
-            }
+            debug("urlExtraction",{name,requestListUrlResponse,urlExtractionType,urlExtractionRule,baseUrl}).then(
+                res=>{
+                    if(res.statusCode!==200){
+                        this.props.changeActive()
+                        this.props.changeText(res.data)
+                    }else{
+                        this.props.changeActive()
+                        this.props.changeText(res.data)
+                        localStorage.setItem('urls',res.data)
+                    }
+                }
+            )
+
         }
     }
 
     componentDidMount(){
-        let urlExtractionType=cookie.load("urlExtractionType") ? cookie.load("urlExtractionType"):"css"
-        let urlExtractionJsonChecked=cookie.load("urlExtractionJsonChecked") ? cookie.load("urlExtractionJsonChecked") : false
-        let urlExtractionRule=cookie.load('urlExtractionRule') ? cookie.load("urlExtractionRule") : ""
+        const urlExtractionType=localStorage.getItem("urlExtractionType") ? localStorage.getItem("urlExtractionType"):"css"
+        const urlExtractionJsonChecked=localStorage.getItem("urlExtractionJsonChecked") ? localStorage.getItem("urlExtractionJsonChecked") : false
+        const urlExtractionRule=localStorage.getItem('urlExtractionRule') ? localStorage.getItem("urlExtractionRule") : ""
         this.setState({
               urlExtractionType,
             urlExtractionJsonChecked,
@@ -81,14 +105,14 @@ export default class UrlExtraction extends Component {
                 <span className="first-request-url-extraction-title">url提取</span>
                 <WrapperSelect
                     data={data}
-                    defaultValue={data[0].value}
+                    value={this.state.urlExtractionType}
                     onChange={this.handleChange}
                     width="123"
                 />
                 </div>
                 <div className='input-explain'>{this.getText()}</div>
                 {this.state.urlExtractionType!=='json' ?
-                <div className="first-request-url-extraction-input"><Input onChange={this.handleInputChange}/>
+                <div className="first-request-url-extraction-input"><Input onChange={this.handleInputChange}  value={this.state.urlExtractionRule}/>
                 <DebugButton  onClick={this.handleClick} text="调试"/></div>
                 :
                 <div className="first-request-url-extraction">
@@ -100,7 +124,7 @@ export default class UrlExtraction extends Component {
                 ></Switch>
                 <span>是否直接提取数据</span>{this.state.urlExtractionJsonChecked ? '' :
                  <div className="first-request-url-extraction-input">
-                     <Input onChange={this.handleInputChange}/>
+                     <Input onChange={this.handleInputChange} value={this.state.urlExtractionRule}/>
                      <DebugButton onClick={this.handleClick}  text="调试"/>
                      </div>}
                      </div>}

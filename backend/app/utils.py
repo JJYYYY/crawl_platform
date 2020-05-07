@@ -7,7 +7,6 @@ from .crawl.common import get,post
 from .hooks import listPageRequestHooks
 
 def getRequestListUrl(name,url,code,params):
-    print("code234",code)
     if name in listPageRequestHooks:
         if "headers" in listPageRequestHooks[name]:
             headers = listPageRequestHooks[name]['headers']()
@@ -19,6 +18,9 @@ def getRequestListUrl(name,url,code,params):
             params=listPageRequestHooks[name]['params']()
         if "timeout" in listPageRequestHooks[name]:
             timeout = listPageRequestHooks[name]['timeout']()
+        if "html" in listPageRequestHooks[name]:
+            html = listPageRequestHooks[name]['html']()
+            return html
     result=get(url,headers if "headers" in locals()  else {},timeout if "timeout" in locals() else 60,code,params=params if "params" in locals() else None,cookies=cookies if "cookies" in locals() else None)
     return result
 
@@ -40,6 +42,27 @@ def postRequestListUrl(name,url,data,code,params):
             data = listPageRequestHooks[name]['data']()
     result=post(url,headers if "headers" in locals() else {"User-Agent":UserAgent().random()},timeout if "timeout" in locals() else 60,params=params if "params" in locals() else None,data=data,cookies=cookies if "cookies" in locals() else None,code=code)
     return result
+
+
+def parseDetailPage(name,url,code):
+    if name in listPageRequestHooks:
+        if "headers" in listPageRequestHooks[name]:
+            headers = listPageRequestHooks[name]['headers']()
+        if "cookies" in listPageRequestHooks[name]:
+            cookies = listPageRequestHooks[name]['cookies']()
+        if "url" in listPageRequestHooks[name]:
+            url = listPageRequestHooks[name]['cookies']()
+        if "params" in listPageRequestHooks[name]:
+            params = listPageRequestHooks[name]['params']()
+        if "timeout" in listPageRequestHooks[name]:
+            timeout = listPageRequestHooks[name]['timeout']()
+        if "html" in listPageRequestHooks[name]:
+            html = listPageRequestHooks[name]['html']()
+            return html
+    result = get(url, headers if "headers" in locals() else {}, timeout if "timeout" in locals() else 60, code,
+                 params=params if "params" in locals() else None, cookies=cookies if "cookies" in locals() else None)
+    return result
+
 
 
 def getCookie(name):
